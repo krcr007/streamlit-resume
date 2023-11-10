@@ -3,7 +3,7 @@ import os
 from langchain.llms import GooglePalm
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
-import fitz
+import PyPDF2
 
 # Initialize GooglePalm LLM
 api = "AIzaSyCE8GPxkKGibdVtSpL4SooR_7hS7auBzWI"
@@ -11,15 +11,14 @@ llm = GooglePalm(google_api_key=api, temperature=0)
 
 # Function to extract text from PDF
 def extract_text_from_pdf(pdf_path):
-    doc = fitz.open(pdf_path)
-    text = ''
-
-    for page_num in range(doc.page_count):
-        page = doc[page_num]
-        text += page.get_text()
-
-    doc.close()
+    with open(pdf_path, "rb") as file:
+        pdf_reader = PyPDF2.PdfFileReader(file)
+        text = ""
+        for page_num in range(pdf_reader.numPages):
+            page = pdf_reader.getPage(page_num)
+            text += page.extractText()
     return text
+
 
 # Function to generate analysis result
 def generate_result(pdf_path):
