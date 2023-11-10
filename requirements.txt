@@ -5,7 +5,7 @@ google-generativeai
 huggingface
 InstructorEmbedding
 transformers
-pymupdf
+PyMuPDF
 torch
 PyPDF2
-frontend
+
