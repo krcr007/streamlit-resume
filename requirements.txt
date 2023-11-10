@@ -7,3 +7,4 @@ InstructorEmbedding
 transformers
 PyMuPDF
 torch
+PyPDF2
