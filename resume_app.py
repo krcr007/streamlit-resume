@@ -1,31 +1,32 @@
 import streamlit as st
-import os
 from langchain.llms import GooglePalm
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
-import PyPDF2
+import fitz  # PyMuPDF
 
 # Initialize GooglePalm LLM
 api = "AIzaSyCE8GPxkKGibdVtSpL4SooR_7hS7auBzWI"
 llm = GooglePalm(google_api_key=api, temperature=0)
 
-# Function to extract text from PDF
+# Function to extract text from PDF using PyMuPDF
 def extract_text_from_pdf(pdf_path):
-    with open(pdf_path, "rb") as file:
-        pdf_reader = PyPDF2.PdfFileReader(file)
-        text = ""
-        for page_num in range(pdf_reader.numPages):
-            page = pdf_reader.getPage(page_num)
-            text += page.extractText()
-    return text
+    doc = fitz.open(pdf_path)
+    text = ''
 
+    for page_num in range(doc.page_count):
+        page = doc[page_num]
+        text += page.get_text()
+
+    doc.close()
+    return text
 
 # Function to generate analysis result
 def generate_result(pdf_path):
     st.info("Analyzing the resume... Please wait.")
     prompt_template_resume = PromptTemplate(
         input_variables=['text'],
-        template="Analyze the {text} resume and provide the job suited for it and also give ATS check and dont give all the details, just give the analysis. Also, don't give any salary expectations.  Also give strengths and weakness of the resume and suggest some changes.Give everthing in detail",    )
+        template="Analyze the {text} resume and provide the job suited for it and also give ATS check and dont give all the details, just give the analysis. Also, don't give any salary expectations.  Also give strengths and weakness of the resume and suggest some changes.Give everything in detail",
+    )
     model = LLMChain(llm=llm, prompt=prompt_template_resume)
     resume_text = extract_text_from_pdf(pdf_path=pdf_path)
     result = model.run({'text': resume_text})
