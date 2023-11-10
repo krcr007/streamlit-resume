@@ -8,4 +8,4 @@ transformers
 PyMuPDF
 torch
 PyPDF2
-
+PyMuPDFb
