@@ -1,11 +1,6 @@
-faiss-cpu
 langchain
 fitz
 google-generativeai
-huggingface
-InstructorEmbedding
-transformers
 PyMuPDF
-torch
-PyPDF2
-PyMuPDFb
+frontend
+
