@@ -17,18 +17,14 @@ def extract_text_from_pdf(pdf_path):
 # Generate analysis
 def generate_result(pdf_path):
 
-  prompt_template = PromptTemplate(template=
-  """
-  Analyze the {text} resume and provide the job suited for it and also give ATS check and dont give all the details, just give the analysis. Also, don't give any salary expectations.
-  Also give strengths and weakness of the resume and suggest some changes.  
-  Give everthing in detail
-  """)
-  
-  model = LLMChain(llm=llm, prompt=prompt_template)
-
-  resume_text = extract_text_from_pdf(pdf_path)
-  
-  return model.run({"text": resume_text})
+  st.info("Analyzing the resume... Please wait.")
+    prompt_template_resume = PromptTemplate(
+        input_variables=['text'],
+        template="Analyze the {text} resume and provide the job suited for it and also give ATS check and dont give all the details, just give the analysis. Also, don't give any salary expectations.  Also give strengths and weakness of the resume and suggest some changes.Give everthing in detail",    )
+    model = LLMChain(llm=llm, prompt=prompt_template_resume)
+    resume_text = extract_text_from_pdf(pdf_path=pdf_path)
+    result = model.run({'text': resume_text})
+    return result
 
 def main():
 
