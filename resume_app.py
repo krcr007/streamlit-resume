@@ -6,7 +6,7 @@ from langchain.llms import GooglePalm
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 import os
-
+import io
 # Initialize LangChain
 api = "AIzaSyCE8GPxkKGibdVtSpL4SooR_7hS7auBzWI"
 llm = GooglePalm(google_api_key=api, temperature=0)
@@ -28,20 +28,48 @@ def generate_result(pdf_path):
     return result
 
 
-def analyze_resumes_in_folder(folder_path, job_role):
+def analyze_resumes_in_folder(uploaded_folder, job_role):
     resumes = []
-    scores = []
 
-    for filename in os.listdir(folder_path):
-        if filename.endswith(".pdf"):
-            resume_path = os.path.join(folder_path, filename)
-            resume_text = extract_text_from_pdf(pdf_path=resume_path)
+    # Check if the uploaded content is a zip file
+    is_zip = any(file.name.endswith('.zip') for file in uploaded_folder)
+
+    if is_zip:
+        with io.BytesIO() as zip_buffer:
+            # Write the content of all files into the buffer
+            for file in uploaded_folder:
+                zip_buffer.write(file.read())
+
+            with zipfile.ZipFile(zip_buffer, 'r') as zip_ref:
+                # Extract the contents of the zip file to a temporary directory
+                temp_dir = 'temp_folder'
+                zip_ref.extractall(temp_dir)
+
+                # Iterate through the extracted files
+                for filename in os.listdir(temp_dir):
+                    file_path = os.path.join(temp_dir, filename)
+                    if filename.endswith('.pdf') and os.path.isfile(file_path):
+                        resume_text = extract_text_from_pdf(file_path)
+
+                        # Generate analysis for each resume
+                        result = model.run({'text': resume_text})
+
+                        # Save resume and corresponding score
+                        resumes.append({'Resume': filename, 'ATS Score': result['ATS Score'], 'Job Role': result['Predicted Job Role']})
+
+        # Remove the temporary directory
+        os.rmdir(temp_dir)
+
+    else:
+        # If the files are not in a zip archive, assume they are individual PDF files
+        for uploaded_file in uploaded_folder:
+            resume_text = extract_text_from_pdf(io.BytesIO(uploaded_file.read()))
 
             # Generate analysis for each resume
             result = model.run({'text': resume_text})
 
             # Save resume and corresponding score
-            resumes.append({'Resume': filename, 'ATS Score': result['ATS Score'], 'Job Role': result['Predicted Job Role']})
+            resumes.append({'Resume': uploaded_file.name, 'ATS Score': result['ATS Score'], 'Job Role': result['Predicted Job Role']})
 
     # Create a DataFrame for easy sorting
     df = pd.DataFrame(resumes)
@@ -54,7 +82,6 @@ def analyze_resumes_in_folder(folder_path, job_role):
 
     return df
 
-import io
 
 # ... (previous code)
 
