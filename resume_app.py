@@ -25,7 +25,15 @@ def generate_result(resume_text):
     )
     model = LLMChain(llm=llm, prompt=prompt_template_resume)
     result = model.run({'text': resume_text})
-    return result
+
+    # Extract relevant information from the result
+    analysis_result = {
+        'ATS Score': result.get('ATS Score', 0),  # Provide a default value if 'ATS Score' is not present
+        'Predicted Job Role': result.get('Predicted Job Role', 'Unknown'),  # Provide a default value if 'Predicted Job Role' is not present
+    }
+
+    return analysis_result
+
 
 def analyze_resumes_in_folder(uploaded_folder, job_role):
     resumes = []
