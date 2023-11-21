@@ -59,10 +59,12 @@ def employer_section():
     uploaded_folder = st.file_uploader("Upload a folder with resumes", type=["zip", "pdf"], key="upload_folder", accept_multiple_files=True)
 
     if uploaded_folder:
-        # Use st.file_uploader as a context manager
-        with uploaded_folder as f:
-            with open("resumes.zip", "wb") as zip_file:
-                zip_file.write(f.read())
+        # Save the uploaded file content to a variable
+        uploaded_content = uploaded_folder.read()
+
+        # Save the content to a file
+        with open("resumes.zip", "wb") as zip_file:
+            zip_file.write(uploaded_content)
 
         job_role = st.text_input("Enter the job role you are looking for:")
 
@@ -76,7 +78,6 @@ def employer_section():
 
             st.markdown(f"### 🎯 Top 10 Resumes for the specified job role ({job_role}):")
             st.table(top_resumes_df[['Resume', 'ATS Score']])
-
 def student_section():
     st.header("📄 Resume Analysis App")
 
