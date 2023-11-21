@@ -5,6 +5,7 @@ from pdfminer.high_level import extract_text
 from langchain.llms import GooglePalm
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
+import os
 
 # Initialize LangChain
 api = "AIzaSyCE8GPxkKGibdVtSpL4SooR_7hS7auBzWI"
