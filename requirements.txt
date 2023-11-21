@@ -1,3 +1,4 @@
 langchain
 pdfminer.six
 google-generativeai
+zipfile
