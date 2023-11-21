@@ -53,6 +53,10 @@ def analyze_resumes_in_folder(folder_path, job_role):
 
     return df
 
+import io
+
+# ... (previous code)
+
 def employer_section():
     st.header("👔 Employer Section")
 
@@ -69,8 +73,11 @@ def employer_section():
         job_role = st.text_input("Enter the job role you are looking for:")
 
         if st.button("Analyze Resumes"):
+            # Use BytesIO to create a stream from the content
+            uploaded_content_stream = io.BytesIO(uploaded_content)
+
             # Extract the uploaded zip file
-            with zipfile.ZipFile("resumes.zip", "r") as zip_ref:
+            with zipfile.ZipFile(uploaded_content_stream, "r") as zip_ref:
                 zip_ref.extractall("resumes_folder")
 
             st.info("Analyzing resumes... Please wait.")
@@ -78,6 +85,7 @@ def employer_section():
 
             st.markdown(f"### 🎯 Top 10 Resumes for the specified job role ({job_role}):")
             st.table(top_resumes_df[['Resume', 'ATS Score']])
+
 def student_section():
     st.header("📄 Resume Analysis App")
 
