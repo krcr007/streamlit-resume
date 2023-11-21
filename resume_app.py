@@ -39,11 +39,13 @@ def analyze_resumes_in_folder(folder_path, job_role):
             result = model.run({'text': resume_text})
 
             # Save resume and corresponding score
-            resumes.append(resume_text)
-            scores.append(result['ATS Score'])
+            resumes.append({'Resume': filename, 'ATS Score': result['ATS Score'], 'Job Role': result['Predicted Job Role']})
 
     # Create a DataFrame for easy sorting
-    df = pd.DataFrame({'Resume': resumes, 'ATS Score': scores})
+    df = pd.DataFrame(resumes)
+
+    # Filter resumes by specified job role
+    df = df[df['Job Role'].str.contains(job_role, case=False)]
 
     # Sort resumes by ATS Score
     df = df.sort_values(by='ATS Score', ascending=False).head(10)
@@ -71,8 +73,8 @@ def employer_section():
             st.info("Analyzing resumes... Please wait.")
             top_resumes_df = analyze_resumes_in_folder("resumes_folder", job_role)
 
-            st.markdown("### 🎯 Top 10 Resumes for the specified job role:")
-            st.table(top_resumes_df)
+            st.markdown(f"### 🎯 Top 10 Resumes for the specified job role ({job_role}):")
+            st.table(top_resumes_df[['Resume', 'ATS Score']])
 
 def student_section():
     st.header("📄 Resume Analysis App")
