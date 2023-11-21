@@ -26,6 +26,7 @@ def generate_result(pdf_path):
     result = model.run({'text': resume_text})
     return result
 
+
 def analyze_resumes_in_folder(folder_path, job_role):
     resumes = []
     scores = []
@@ -55,7 +56,7 @@ def analyze_resumes_in_folder(folder_path, job_role):
 def employer_section():
     st.header("👔 Employer Section")
 
-    uploaded_folder = st.file_uploader("Upload a folder with resumes", type=["zip"], key="upload_folder")
+    uploaded_folder = st.file_uploader("Upload a folder with resumes", type=["zip", "pdf"], key="upload_folder", accept_multiple_files=True)
 
     if uploaded_folder:
         # Use st.file_uploader as a context manager
