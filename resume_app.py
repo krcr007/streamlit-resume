@@ -1,32 +1,31 @@
 import streamlit as st
-
 from pdfminer.high_level import extract_text
-
 from langchain.llms import GooglePalm
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 import os
 import io
+import zipfile
+import pandas as pd
+
 # Initialize LangChain
 api = "AIzaSyCE8GPxkKGibdVtSpL4SooR_7hS7auBzWI"
 llm = GooglePalm(google_api_key=api, temperature=0)
 
 # PDF text extraction
 def extract_text_from_pdf(pdf_path):
-  return extract_text(pdf_path)
+    return extract_text(pdf_path)
 
 # Generate analysis
-def generate_result(pdf_path):
-
+def generate_result(resume_text):
     st.info("Analyzing the resume... Please wait.")
     prompt_template_resume = PromptTemplate(
         input_variables=['text'],
-        template="Analyze the {text} resume and provide the job suited for it and also give ATS check and dont give all the details, just give the analysis. Also, don't give any salary expectations.  Also give strengths and weakness of the resume and suggest some changes.Give everthing in detail",)
+        template="Analyze the {text} resume and provide the job suited for it and also give ATS check and don't give all the details, just give the analysis. Also, don't give any salary expectations. Also, give strengths and weaknesses of the resume and suggest some changes. Give everything in detail",
+    )
     model = LLMChain(llm=llm, prompt=prompt_template_resume)
-    resume_text = extract_text_from_pdf(pdf_path=pdf_path)
     result = model.run({'text': resume_text})
     return result
-
 
 def analyze_resumes_in_folder(uploaded_folder, job_role):
     resumes = []
@@ -66,7 +65,7 @@ def analyze_resumes_in_folder(uploaded_folder, job_role):
             resume_text = extract_text_from_pdf(io.BytesIO(uploaded_file.read()))
 
             # Generate analysis for each resume
-            result = model.run({'text': resume_text})
+            result = generate_result(resume_text)
 
             # Save resume and corresponding score
             resumes.append({'Resume': uploaded_file.name, 'ATS Score': result['ATS Score'], 'Job Role': result['Predicted Job Role']})
@@ -81,9 +80,6 @@ def analyze_resumes_in_folder(uploaded_folder, job_role):
     df = df.sort_values(by='ATS Score', ascending=False).head(10)
 
     return df
-
-
-# ... (previous code)
 
 def employer_section():
     st.header("👔 Employer Section")
@@ -100,7 +96,6 @@ def employer_section():
             st.markdown(f"### 🎯 Top 10 Resumes for the specified job role ({job_role}):")
             st.table(top_resumes_df[['Resume', 'ATS Score']])
 
-
 def student_section():
     st.header("📄 Resume Analysis App")
 
@@ -109,10 +104,9 @@ def student_section():
     if uploaded_file:
         # Use st.file_uploader as a context manager
         with uploaded_file as f:
-            with open("resume.pdf", "wb") as resume_file:
-                resume_file.write(f.read())
+            resume_text = extract_text_from_pdf(io.BytesIO(f.read()))
 
-        result = generate_result("resume.pdf")
+        result = generate_result(resume_text)
 
         st.markdown("### 🚀 Analysis Result:")
         st.write(result)
@@ -130,7 +124,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-
