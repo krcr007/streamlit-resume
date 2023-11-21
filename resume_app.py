@@ -26,41 +26,6 @@ def generate_result(pdf_path):
     result = model.run({'text': resume_text})
     return result
 
-def main():
-
-  st.markdown("""
-    <style>
-    body {
-      background-color: #f8f9fa;
-    }
-    .stButton {
-      background-color: #007bff;
-      color: white;   
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-  st.title("📄 Resume Analysis App")
-
-  uploaded_file = st.file_uploader("Choose a PDF", type=["pdf"])
-
-  if uploaded_file:
-    with open("resume.pdf","wb") as f:
-      f.write(uploaded_file.getvalue())
-
-    result = generate_result("resume.pdf")
-
-    st.markdown("### 🚀 Analysis Result:")
-    st.write(result)
-
-    st.success("Analysis complete!")
-import os
-import pandas as pd
-import streamlit as st
-import zipfile
-
-# ... (previous code)
-
 def analyze_resumes_in_folder(folder_path, job_role):
     resumes = []
     scores = []
@@ -91,8 +56,10 @@ def employer_section():
     uploaded_folder = st.file_uploader("Upload a folder with resumes", type=["zip"], key="upload_folder")
 
     if uploaded_folder:
-        with open("resumes.zip", "wb") as f:
-            f.write(uploaded_folder.getvalue())
+        # Use st.file_uploader as a context manager
+        with uploaded_folder as f:
+            with open("resumes.zip", "wb") as zip_file:
+                zip_file.write(f.read())
 
         job_role = st.text_input("Enter the job role you are looking for:")
 
@@ -113,8 +80,10 @@ def student_section():
     uploaded_file = st.file_uploader("Choose a PDF", type=["pdf"])
 
     if uploaded_file:
-        with open("resume.pdf", "wb") as f:
-            f.write(uploaded_file.getvalue())
+        # Use st.file_uploader as a context manager
+        with uploaded_file as f:
+            with open("resume.pdf", "wb") as resume_file:
+                resume_file.write(f.read())
 
         result = generate_result("resume.pdf")
 
@@ -131,6 +100,9 @@ def main():
         student_section()
     elif section == "Employer":
         employer_section()
+
+if __name__ == '__main__':
+    main()
 
 if __name__ == '__main__':
     main()
