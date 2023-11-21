@@ -61,23 +61,11 @@ def employer_section():
     st.header("👔 Employer Section")
 
     uploaded_folder = st.file_uploader("Upload a folder with resumes", type=["zip", "pdf"], key="upload_folder", accept_multiple_files=True)
-
-    if uploaded_folder:
-        # Save the uploaded file content to a variable
-        uploaded_content = uploaded_folder.read()
-
-        # Save the content to a file
-        with open("resumes.zip", "wb") as zip_file:
-            zip_file.write(uploaded_content)
-
-        job_role = st.text_input("Enter the job role you are looking for:")
+    job_role = st.text_input("Enter the job role you are looking for:")
 
         if st.button("Analyze Resumes"):
-            # Use BytesIO to create a stream from the content
-            uploaded_content_stream = io.BytesIO(uploaded_content)
-
             # Extract the uploaded zip file
-            with zipfile.ZipFile(uploaded_content_stream, "r") as zip_ref:
+            with zipfile.ZipFile("resumes.zip", "r") as zip_ref:
                 zip_ref.extractall("resumes_folder")
 
             st.info("Analyzing resumes... Please wait.")
