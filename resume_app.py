@@ -52,7 +52,7 @@ def analyze_resumes_in_folder(uploaded_folder, job_role):
                         resume_text = extract_text_from_pdf(file_path)
 
                         # Generate analysis for each resume
-                        result = model.run({'text': resume_text})
+                        result = generate_result(resume_text)
 
                         # Save resume and corresponding score
                         resumes.append({'Resume': filename, 'ATS Score': result['ATS Score'], 'Job Role': result['Predicted Job Role']})
