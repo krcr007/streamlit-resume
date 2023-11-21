@@ -60,19 +60,18 @@ import io
 def employer_section():
     st.header("👔 Employer Section")
 
-    uploaded_folder = st.file_uploader("Upload a folder with resumes", type=["zip", "pdf"], key="upload_folder", accept_multiple_files=True)
-    job_role = st.text_input("Enter the job role you are looking for:")
+    uploaded_folder = st.file_uploader("Upload resumes", type=["zip", "pdf"], key="upload_folder", accept_multiple_files=True)
+
+    if uploaded_folder:
+        job_role = st.text_input("Enter the job role you are looking for:")
 
         if st.button("Analyze Resumes"):
-            # Extract the uploaded zip file
-            with zipfile.ZipFile("resumes.zip", "r") as zip_ref:
-                zip_ref.extractall("resumes_folder")
+            top_resumes_df = analyze_resumes_in_folder(uploaded_folder, job_role)
 
             st.info("Analyzing resumes... Please wait.")
-            top_resumes_df = analyze_resumes_in_folder("resumes_folder", job_role)
-
             st.markdown(f"### 🎯 Top 10 Resumes for the specified job role ({job_role}):")
             st.table(top_resumes_df[['Resume', 'ATS Score']])
+
 
 def student_section():
     st.header("📄 Resume Analysis App")
