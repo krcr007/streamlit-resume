@@ -20,7 +20,7 @@ def generate_result(pdf_path):
     st.info("Analyzing the resume... Please wait.")
     prompt_template_resume = PromptTemplate(
         input_variables=['text'],
-        template="Analyze the {text} resume and provide the job suited for it and also give ATS check and dont give all the details, just give the analysis.Dont give any salary expectations details in it.  Also give strengths and weakness of the resume and suggest some changes.Give everthing in detail",)
+        template="Analyze the {text} resume and provide the job suited for it and also give ATS check and dont give all the details, just give the analysis.Dont give any salary expectations details in it.  Also give strengths and weakness of the resume and suggest some changes.Give everthing in detail.Also Give indepth knowledge about the job expectaions.",)
     model = LLMChain(llm=llm, prompt=prompt_template_resume)
     resume_text = extract_text_from_pdf(pdf_path=pdf_path)
     result = model.run({'text': resume_text})
