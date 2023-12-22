@@ -1,4 +1,4 @@
 langchain
 pdfminer.six
 google-generativeai
-
+pip install --upgrade langchain_core
